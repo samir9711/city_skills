@@ -2,31 +2,19 @@
 
 namespace App\Services\Model\Skill;
 
+use App\Http\Resources\Model\SkillResource;
+use App\Models\Skill;
+use App\Models\User;
 use App\Services\Basic\BasicCrudService;
 use App\Services\Basic\ModelColumnsService;
-use App\Models\Skill;
-use App\Models\SkillUser;
-use App\Http\Resources\Model\SkillResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SkillService extends BasicCrudService
 {
-    /**
-     * إجمالي عدد الأصوات (عدد السجلات في skill_users)
-     */
-    protected int $totalVotes;
+    protected array $skillPercentages = [];
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->totalVotes = SkillUser::count();
-    }
-
-    /**
-     * Override setVariables لإضافة countRelations وضبط modelColumnsService
-     */
     protected function setVariables(): void
     {
         $this->modelColumnsService = ModelColumnsService::getServiceFor(
@@ -39,39 +27,64 @@ class SkillService extends BasicCrudService
     }
 
     /**
-     * Override allQuery لإضافة withCount('users') لكل الاستعلامات
+     * حساب النسب الحقيقية بحيث يكون مجموعها 100%
      */
+    protected function calculatePercentages(): void
+    {
+        $weights = DB::table('skill_users as su')
+            ->join(
+                DB::raw('(
+                    SELECT user_id, COUNT(*) as total_skills
+                    FROM skill_users
+                    GROUP BY user_id
+                ) as c'),
+                'su.user_id',
+                '=',
+                'c.user_id'
+            )
+            ->selectRaw('su.skill_id, SUM(1 / c.total_skills) as score')
+            ->groupBy('su.skill_id')
+            ->pluck('score', 'skill_id');
+
+        $totalScore = $weights->sum();
+
+        foreach ($weights as $skillId => $score) {
+            $this->skillPercentages[$skillId] = $totalScore > 0
+                ? round(($score / $totalScore) * 100, 2)
+                : 0;
+        }
+    }
+
     protected function allQuery(): object
     {
         return parent::allQuery()->withCount('users');
     }
 
-    public function pureAll(Request $request): mixed
-    {
-        $data = $this->allQuery()->get();
-
-        return $this->resource::collection($data)->each(function ($item) {
-            $item->setTotalVotes($this->totalVotes);
-        });
-    }
-
-    /**
-     * Override all لتمرير totalUsers إلى كل عنصر
-     */
     public function all(Request $request): mixed
     {
+        $this->calculatePercentages();
+
         $data = $this->allQuery()->get();
 
-        return $this->resource::collection($data)->each(function ($item) {
-            $item->setTotalVotes($this->totalVotes);
+        $data->transform(function ($skill) {
+            $skill->users_percentage =
+                $this->skillPercentages[$skill->id] ?? 0;
+
+            return $skill;
         });
+
+        return $this->resource::collection($data);
     }
 
-    /**
-     * Override allPaginated لتمرير totalUsers إلى كل عنصر في الصفحة
-     */
+    public function pureAll(Request $request): mixed
+    {
+        return $this->all($request);
+    }
+
     public function allPaginated(Request $request): mixed
     {
+        $this->calculatePercentages();
+
         $data = $this->allQuery()->paginate(
             $request->input('per_page', 10),
             ['*'],
@@ -79,10 +92,11 @@ class SkillService extends BasicCrudService
             $request->input('page', 1)
         );
 
-        $data->getCollection()->transform(function ($item) {
-            $item->totalVotes = $this->totalVotes;
+        $data->getCollection()->transform(function ($skill) {
+            $skill->users_percentage =
+                $this->skillPercentages[$skill->id] ?? 0;
 
-            return $item;
+            return $skill;
         });
 
         return [
@@ -94,17 +108,18 @@ class SkillService extends BasicCrudService
         ];
     }
 
-    /**
-     * Override show لتمرير totalUsers إلى Resource
-     */
     public function show(Request $request): mixed
     {
+        $this->calculatePercentages();
+
         $this->object = $this->model::with($this->relations)
             ->withTrashed()
             ->withCount($this->countRelations)
             ->findOrFail($request->id);
 
-        return $this->resource::make($this->object)
-            ->setTotalVotes($this->totalVotes);
+        $this->object->users_percentage =
+            $this->skillPercentages[$this->object->id] ?? 0;
+
+        return $this->resource::make($this->object);
     }
 }
