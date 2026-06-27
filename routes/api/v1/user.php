@@ -60,7 +60,7 @@ Route::prefix('user')->name('user.')->group(function () {
 
     });
 
-    Route::prefix('question')->middleware('auth:admin')->group(function () {
+    Route::prefix('question')->middleware('auth:user')->group(function () {
         Route::get('/all/paginated', [QuestionController::class, 'allPaginated']);
         Route::get('/all',           [QuestionController::class, 'all']);
         Route::post('/show',         [QuestionController::class, 'show']);
