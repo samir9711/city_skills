@@ -3,6 +3,8 @@
 
 
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\Skill\SkillController;
+use App\Http\Controllers\SkillUser\SkillUserController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\UserAnswer\UserAnswerController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +44,21 @@ Route::prefix('user')->name('user.')->group(function () {
     Route::prefix('user-answer')->middleware('auth:user')->group(function () {
         Route::post('/submit', [UserAnswerController::class, 'submitAnswers']);
     });
+
+
+    Route::prefix('skill')->group(function () {
+        Route::get('/all/paginated', [SkillController::class, 'allPaginated']);
+        Route::get('/all',           [SkillController::class, 'all']);
+        Route::post('/show',         [SkillController::class, 'show']);
+
+    });
+
+    Route::prefix('skill-user')->middleware('auth:user')->group(function () {
+        Route::get('/store-skills',  [SkillUserController::class, 'storeSkills']);
+        Route::get('/delete-skills', [SkillUserController::class, 'deleteSkills']);
+
+    });
+
 
 
 

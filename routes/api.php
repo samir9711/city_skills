@@ -63,3 +63,26 @@ Route::prefix('user-answer')->group(function () {
     Route::post('/deactivate',   [\App\Http\Controllers\UserAnswer\UserAnswerController::class, 'deactivate']);
 });
 */
+
+// Skill PUBLIC ROUTES
+/*
+Route::prefix('skill')->group(function () {
+    Route::get('/all/paginated', [\App\Http\Controllers\Skill\SkillController::class, 'allPaginated']);
+    Route::get('/all',           [\App\Http\Controllers\Skill\SkillController::class, 'all']);
+    Route::post('/show',         [\App\Http\Controllers\Skill\SkillController::class, 'show']);
+    Route::post('/create',       [\App\Http\Controllers\Skill\SkillController::class, 'store']);
+    Route::post('/update',       [\App\Http\Controllers\Skill\SkillController::class, 'update']);
+    Route::post('/activate',     [\App\Http\Controllers\Skill\SkillController::class, 'activate']);
+    Route::post('/deactivate',   [\App\Http\Controllers\Skill\SkillController::class, 'deactivate']);
+});
+*/
+// SkillUser PUBLIC ROUTES
+Route::prefix('skill-user')->group(function () {
+    Route::get('/all/paginated', [\App\Http\Controllers\SkillUser\SkillUserController::class, 'allPaginated']);
+    Route::get('/all',           [\App\Http\Controllers\SkillUser\SkillUserController::class, 'all']);
+    Route::post('/show',         [\App\Http\Controllers\SkillUser\SkillUserController::class, 'show']);
+    Route::post('/create',       [\App\Http\Controllers\SkillUser\SkillUserController::class, 'store']);
+    Route::post('/update',       [\App\Http\Controllers\SkillUser\SkillUserController::class, 'update']);
+    Route::post('/activate',     [\App\Http\Controllers\SkillUser\SkillUserController::class, 'activate']);
+    Route::post('/deactivate',   [\App\Http\Controllers\SkillUser\SkillUserController::class, 'deactivate']);
+});
