@@ -18,6 +18,16 @@ class SkillUser extends BaseModel
         'skill_id' => 'integer',
     ];
 
+    protected array $filterable = [
+        'user_id'=>'int',
+        'skill_id'=>'int',
+    ];
+
+    protected array $dynamicFilterColumns = [
+        'user_id' ,
+        'skill_id',
+    ];
+
     public function skill()
     {
         return $this->belongsTo(Skill::class);

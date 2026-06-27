@@ -50,10 +50,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/all/paginated', [UserController::class, 'allPaginated']);
         Route::get('/all',           [UserController::class, 'all']);
         Route::post('/show',         [UserController::class, 'show']);
-        Route::post('/create',       [UserController::class, 'store']);
-        Route::post('/update',       [UserController::class, 'update']);
-        Route::post('/activate',     [UserController::class, 'activate']);
-        Route::post('/deactivate',   [UserController::class, 'deactivate']);
+      
     });
 
     // UserAnswer PUBLIC ROUTES
@@ -72,9 +69,12 @@ Route::prefix('admin')->group(function () {
         Route::get('/all/paginated', [SkillUserController::class, 'allPaginated']);
         Route::get('/all',           [SkillUserController::class, 'all']);
         Route::post('/show',         [SkillUserController::class, 'show']);
-        
+
 
     });
+
+
+
 
 
 
