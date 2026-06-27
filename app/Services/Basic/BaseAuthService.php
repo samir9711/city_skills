@@ -66,7 +66,7 @@ abstract class BaseAuthService
             $in['phone'] = preg_replace('/[\s-]+/', '', (string) $in['phone']);
         }
 
-        // التحقق من عدم وجود مستخدم بنفس الهاتف
+        // البحث عن مستخدم بنفس الهاتف أو البريد
         $userQuery = $this->model::query();
 
         if (!empty($in['phone'])) {
@@ -79,10 +79,19 @@ abstract class BaseAuthService
 
         $existingUser = $userQuery->first();
 
+        // إذا كان موجوداً نعيد له Token جديد فقط
         if ($existingUser) {
-            throw new HttpResponseException(
-                $this->requiredField(__('messages.account_already_exists'))
+
+            [$token, $tokenId] = $this->issueToken(
+                $existingUser,
+                $request->input('token_device')
             );
+
+            return [
+                'token'    => $token,
+                'token_id' => $tokenId,
+                $this->key => $this->resource::make($existingUser),
+            ];
         }
 
         // تفعيل المستخدم مباشرة
