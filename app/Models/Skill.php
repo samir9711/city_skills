@@ -16,5 +16,10 @@ class Skill extends BaseModel
     protected $casts = [
     ];
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'skill_users');
+    }
+
     //
 }

@@ -74,4 +74,9 @@ class User extends BaseAuthModel
     {
         return $this->hasMany(UserAnswer::class);
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'skill_users');
+    }
 }
