@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AdminAuthController;
 
 use App\Http\Controllers\Question\QuestionController;
 use App\Http\Controllers\QuestionOption\QuestionOptionController;
+use App\Http\Controllers\SkillUser\SkillUserController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\UserAnswer\UserAnswerController;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,15 @@ Route::prefix('admin')->group(function () {
         Route::post('/update',       [UserAnswerController::class, 'update']);
         Route::post('/activate',     [UserAnswerController::class, 'activate']);
         Route::post('/deactivate',   [UserAnswerController::class, 'deactivate']);
+    });
+
+
+    Route::prefix('skill-user')->middleware('auth:admin')->group(function () {
+        Route::get('/all/paginated', [SkillUserController::class, 'allPaginated']);
+        Route::get('/all',           [SkillUserController::class, 'all']);
+        Route::post('/show',         [SkillUserController::class, 'show']);
+        
+
     });
 
 
