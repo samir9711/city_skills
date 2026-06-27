@@ -10,7 +10,7 @@ class StoreSkillRequest extends BasicRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -21,6 +21,7 @@ class StoreSkillRequest extends BasicRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
         ];
     }
 

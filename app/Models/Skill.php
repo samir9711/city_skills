@@ -10,6 +10,7 @@ class Skill extends BaseModel
 {
     protected $fillable = [
         'name' => 'name',
+        'description' => 'description',
     ];
 
     protected $casts = [
