@@ -54,8 +54,8 @@ Route::prefix('user')->name('user.')->group(function () {
     });
 
     Route::prefix('skill-user')->middleware('auth:user')->group(function () {
-        Route::get('/store-skills',  [SkillUserController::class, 'storeSkills']);
-        Route::get('/delete-skills', [SkillUserController::class, 'deleteSkills']);
+        Route::post('/store-skills',  [SkillUserController::class, 'storeSkills']);
+        Route::post('/delete-skills', [SkillUserController::class, 'deleteSkills']);
 
     });
 
