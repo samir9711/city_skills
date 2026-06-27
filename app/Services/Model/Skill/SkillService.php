@@ -5,20 +5,23 @@ namespace App\Services\Model\Skill;
 use App\Services\Basic\BasicCrudService;
 use App\Services\Basic\ModelColumnsService;
 use App\Models\Skill;
-use App\Models\User;
+use App\Models\SkillUser;
 use App\Http\Resources\Model\SkillResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class SkillService extends BasicCrudService
 {
-    protected $totalUsers; // لتخزين العدد الإجمالي للمستخدمين
+    /**
+     * إجمالي عدد الأصوات (عدد السجلات في skill_users)
+     */
+    protected int $totalVotes;
 
     public function __construct()
     {
         parent::__construct();
-        // حساب العدد الإجمالي للمستخدمين النشطين (غير المحذوفين) مرة واحدة
-        $this->totalUsers = User::withoutTrashed()->count();
+
+        $this->totalVotes = SkillUser::count();
     }
 
     /**
@@ -31,7 +34,8 @@ class SkillService extends BasicCrudService
         );
 
         $this->resource = SkillResource::class;
-        $this->countRelations = ['users']; // سيتم تحميلها في show
+
+        $this->countRelations = ['users'];
     }
 
     /**
@@ -42,14 +46,12 @@ class SkillService extends BasicCrudService
         return parent::allQuery()->withCount('users');
     }
 
-    /**
-     * Override pureAll لتمرير totalUsers إلى كل عنصر
-     */
     public function pureAll(Request $request): mixed
     {
         $data = $this->allQuery()->get();
+
         return $this->resource::collection($data)->each(function ($item) {
-            $item->setTotalUsers($this->totalUsers);
+            $item->setTotalVotes($this->totalVotes);
         });
     }
 
@@ -59,8 +61,9 @@ class SkillService extends BasicCrudService
     public function all(Request $request): mixed
     {
         $data = $this->allQuery()->get();
+
         return $this->resource::collection($data)->each(function ($item) {
-            $item->setTotalUsers($this->totalUsers);
+            $item->setTotalVotes($this->totalVotes);
         });
     }
 
@@ -76,9 +79,9 @@ class SkillService extends BasicCrudService
             $request->input('page', 1)
         );
 
-        // تمرير totalUsers لكل عنصر في المجموعة قبل التحويل إلى Resource
         $data->getCollection()->transform(function ($item) {
-            $item->totalUsers = $this->totalUsers; // نضعها مباشرة في النموذج
+            $item->totalVotes = $this->totalVotes;
+
             return $item;
         });
 
@@ -101,6 +104,7 @@ class SkillService extends BasicCrudService
             ->withCount($this->countRelations)
             ->findOrFail($request->id);
 
-        return $this->resource::make($this->object)->setTotalUsers($this->totalUsers);
+        return $this->resource::make($this->object)
+            ->setTotalVotes($this->totalVotes);
     }
 }

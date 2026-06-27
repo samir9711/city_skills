@@ -3,24 +3,29 @@
 namespace App\Http\Resources\Model;
 
 use App\Models\Skill;
+use App\Models\SkillUser;
 use Illuminate\Http\Request;
 use App\Http\Resources\Basic\BasicResource;
 use App\Services\Basic\ModelColumnsService;
 
 class SkillResource extends BasicResource
 {
-    public $totalUsers; // خاصية عامة لحمل العدد الإجمالي للمستخدمين
+    /**
+     * إجمالي عدد الأصوات
+     */
+    public $totalVotes;
 
-    public function __construct($resource, $totalUsers = null)
+    public function __construct($resource, $totalVotes = null)
     {
         parent::__construct($resource);
-        $this->totalUsers = $totalUsers;
+
+        $this->totalVotes = $totalVotes;
     }
 
-    // دالة مساعدة لتحديد totalUsers بعد الإنشاء
-    public function setTotalUsers($totalUsers)
+    public function setTotalVotes($totalVotes)
     {
-        $this->totalUsers = $totalUsers;
+        $this->totalVotes = $totalVotes;
+
         return $this;
     }
 
@@ -33,18 +38,18 @@ class SkillResource extends BasicResource
 
     protected function initResource($modelColumnsService): array
     {
-        // بناء الأعمدة الأساسية
         $this->result = parent::initResource($modelColumnsService);
 
-        // عدد المستخدمين لهذه المهارة (يجب أن يكون محملاً بـ withCount)
-        $usersCount = $this->users_count ?? 0;
+        // عدد الأصوات لهذه المهارة
+        $votes = $this->users_count ?? 0;
 
-        // العدد الكلي للمستخدمين: إما من الخاصية أو حساب احتياطي
-        $totalUsers = $this->totalUsers ?? \App\Models\User::withoutTrashed()->count();
+        // إجمالي الأصوات
+        $totalVotes = $this->totalVotes
+            ?? $this->resource->totalVotes
+            ?? SkillUser::count();
 
-        // حساب النسبة المئوية (برقمين عشريين)
-        $this->result['users_percentage'] = $totalUsers > 0
-            ? round(($usersCount / $totalUsers) * 100, 2)
+        $this->result['users_percentage'] = $totalVotes > 0
+            ? round(($votes / $totalVotes) * 100, 2)
             : 0;
 
         return $this->result;
