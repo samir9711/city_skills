@@ -64,10 +64,7 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('/all/paginated', [QuestionController::class, 'allPaginated']);
         Route::get('/all',           [QuestionController::class, 'all']);
         Route::post('/show',         [QuestionController::class, 'show']);
-        Route::post('/create',       [QuestionController::class, 'store']);
-        Route::post('/update',       [QuestionController::class, 'update']);
-        Route::post('/activate',     [QuestionController::class, 'activate']);
-        Route::post('/deactivate',   [QuestionController::class, 'deactivate']);
+      
     });
 
 
