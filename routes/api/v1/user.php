@@ -3,6 +3,7 @@
 
 
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\Question\QuestionController;
 use App\Http\Controllers\Skill\SkillController;
 use App\Http\Controllers\SkillUser\SkillUserController;
 use App\Http\Controllers\User\UserController;
@@ -57,6 +58,16 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::post('/store-skills',  [SkillUserController::class, 'storeSkills']);
         Route::post('/delete-skills', [SkillUserController::class, 'deleteSkills']);
 
+    });
+
+    Route::prefix('question')->middleware('auth:admin')->group(function () {
+        Route::get('/all/paginated', [QuestionController::class, 'allPaginated']);
+        Route::get('/all',           [QuestionController::class, 'all']);
+        Route::post('/show',         [QuestionController::class, 'show']);
+        Route::post('/create',       [QuestionController::class, 'store']);
+        Route::post('/update',       [QuestionController::class, 'update']);
+        Route::post('/activate',     [QuestionController::class, 'activate']);
+        Route::post('/deactivate',   [QuestionController::class, 'deactivate']);
     });
 
 
