@@ -67,7 +67,7 @@ Route::prefix('user')->name('user.')->group(function () {
 
     });
 
-    Route::prefix('skill-user')->middleware('auth:admin')->group(function () {
+    Route::prefix('skill-user')->middleware('auth:user')->group(function () {
         Route::get('/all/paginated', [SkillUserController::class, 'allPaginated']);
         Route::get('/all',           [SkillUserController::class, 'all']);
         Route::post('/show',         [SkillUserController::class, 'show']);
