@@ -184,5 +184,20 @@ abstract class FatherCrudController extends Controller
         }
     }
 
+    public function count(Request $request)
+    {
+        try {
+
+            return $this->apiResponse(
+                $this->service::count($request)
+            );
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+
+        }
+    }
+
 
 }

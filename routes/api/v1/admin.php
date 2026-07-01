@@ -50,7 +50,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/all/paginated', [UserController::class, 'allPaginated']);
         Route::get('/all',           [UserController::class, 'all']);
         Route::post('/show',         [UserController::class, 'show']);
-      
+        Route::get('/count',         [UserController::class, 'count']);
+
     });
 
     // UserAnswer PUBLIC ROUTES

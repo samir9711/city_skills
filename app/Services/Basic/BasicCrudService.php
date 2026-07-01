@@ -98,4 +98,11 @@ abstract class BasicCrudService {
     {
         return $this->object;
     }
+
+    public function count(Request $request): array
+    {
+        return [
+            'count' => $this->model::withFilters()->count(),
+        ];
+    }
 }
