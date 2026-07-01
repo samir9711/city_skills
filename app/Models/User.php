@@ -57,6 +57,9 @@ class User extends BaseAuthModel
         'remember_token',
     ];
 
+
+    protected $search = ['name'];
+
     /**
      * Get the attributes that should be cast.
      *
